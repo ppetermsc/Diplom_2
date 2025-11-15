@@ -1,0 +1,81 @@
+package tests;
+
+import api.models.request.UserRequest;
+import api.models.response.UserResponse;
+import api.models.response.ErrorResponse;
+import steps.UserSteps;
+import utils.TestDataGenerator;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
+import org.junit.Test;
+
+public class UserRegistrationTests {
+
+    @Test
+    @DisplayName("Создание уникального пользователя")
+    @Description("Проверка успешной регистрации нового пользователя с валидными данными")
+    public void createUniqueUser() {
+        // Arrange
+        UserRequest user = TestDataGenerator.generateUniqueUser();
+
+        // Act
+        UserResponse response = UserSteps.createUser(user);
+
+        // Assert
+        TestAssertions.assertSuccessResponse(response);
+        TestAssertions.assertUserData(response, user.getEmail(), user.getName());
+        TestAssertions.assertAccessTokenNotNull(response);
+    }
+
+    @Test
+    @DisplayName("Создание уже зарегистрированного пользователя")
+    @Description("Проверка ошибки при попытке регистрации существующего пользователя")
+    public void createExistingUser() {
+        // Arrange
+        UserRequest existingUser = TestDataGenerator.generateUniqueUser();
+
+        // Сначала создаем пользователя
+        UserSteps.createUser(existingUser);
+
+        // Act - пытаемся создать того же пользователя again
+        Response response = UserSteps.createUserAndGetResponse(existingUser);
+        ErrorResponse errorResponse = UserSteps.extractError(response);
+
+        // Assert
+        TestAssertions.assertStatusCode(response, 403);
+        TestAssertions.assertErrorResponse(errorResponse, "User already exists");
+    }
+
+    @Test
+    @DisplayName("Создание пользователя без обязательного поля email")
+    @Description("Проверка ошибки при регистрации без обязательного поля email")
+    public void createUserWithoutEmail() {
+        // Arrange
+        UserRequest userWithoutEmail = TestDataGenerator.generateUserWithoutEmail();
+
+        // Act
+        Response response = UserSteps.createUserAndGetResponse(userWithoutEmail);
+        ErrorResponse errorResponse = UserSteps.extractError(response);
+
+        // Assert
+        TestAssertions.assertStatusCode(response, 403); // ИЗМЕНИЛ: было 400, стало 403
+        TestAssertions.assertErrorResponse(errorResponse, "Email, password and name are required fields");
+    }
+
+    @Test
+    @DisplayName("Создание пользователя без обязательного поля password")
+    @Description("Проверка ошибки при регистрации без обязательного поля password")
+    public void createUserWithoutPassword() {
+        // Arrange
+        UserRequest userWithoutPassword = TestDataGenerator.generateUserWithoutPassword();
+
+        // Act
+        Response response = UserSteps.createUserAndGetResponse(userWithoutPassword);
+        ErrorResponse errorResponse = UserSteps.extractError(response);
+
+        // Assert
+        TestAssertions.assertStatusCode(response, 403); // ИЗМЕНИЛ: было 400, стало 403
+        TestAssertions.assertErrorResponse(errorResponse, "Email, password and name are required fields");
+    }
+}
