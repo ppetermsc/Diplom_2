@@ -38,12 +38,13 @@ public class UserRegistrationTests {
         // Сначала создаем пользователя
         UserSteps.createUser(existingUser);
 
-        // Act - пытаемся создать того же пользователя again
+        // Act - пытаемся опять создать того же пользователя
         Response response = UserSteps.createUserAndGetResponse(existingUser);
         ErrorResponse errorResponse = UserSteps.extractError(response);
 
         // Assert
-        TestAssertions.assertStatusCode(response, 403);
+        // Числовой код заменен на читаемый метод
+        TestAssertions.assertStatusCodeForbidden(response);
         TestAssertions.assertErrorResponse(errorResponse, "User already exists");
     }
 
@@ -59,7 +60,8 @@ public class UserRegistrationTests {
         ErrorResponse errorResponse = UserSteps.extractError(response);
 
         // Assert
-        TestAssertions.assertStatusCode(response, 403); // ИЗМЕНИЛ: было 400, стало 403
+        // Числовой код заменен на читаемый метод
+        TestAssertions.assertStatusCodeForbidden(response);
         TestAssertions.assertErrorResponse(errorResponse, "Email, password and name are required fields");
     }
 
@@ -75,7 +77,29 @@ public class UserRegistrationTests {
         ErrorResponse errorResponse = UserSteps.extractError(response);
 
         // Assert
-        TestAssertions.assertStatusCode(response, 403); // ИЗМЕНИЛ: было 400, стало 403
+        // Числовой код заменен на читаемый метод
+        TestAssertions.assertStatusCodeForbidden(response);
+        TestAssertions.assertErrorResponse(errorResponse, "Email, password and name are required fields");
+    }
+
+    @Test
+    @DisplayName("Создание пользователя без обязательного поля имя")
+    @Description("Проверка ошибки при регистрации без обязательного поля имя")
+    public void createUserWithoutName() {
+        // Arrange
+        UserRequest userWithoutName = new UserRequest(
+                "test@example.com",
+                "password123",
+                null  // отсутствует имя
+        );
+
+        // Act
+        Response response = UserSteps.createUserAndGetResponse(userWithoutName);
+        ErrorResponse errorResponse = UserSteps.extractError(response);
+
+        // Assert
+        // Числовой код заменен на читаемый метод
+        TestAssertions.assertStatusCodeForbidden(response);
         TestAssertions.assertErrorResponse(errorResponse, "Email, password and name are required fields");
     }
 }

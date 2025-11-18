@@ -9,6 +9,7 @@ import steps.UserSteps;
 import steps.OrderSteps;
 import utils.TestDataGenerator;
 import io.restassured.response.Response;
+import org.junit.Before;
 import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 import io.qameta.allure.Description;
@@ -16,6 +17,15 @@ import io.qameta.allure.Description;
 import java.util.List;
 
 public class OrderCreationTests {
+
+    private UserRequest user;
+    private String accessToken;
+
+    @Before
+    public void setUp() {  // Создаем пользователя до тестов
+        user = TestDataGenerator.generateUniqueUser();
+        accessToken = UserSteps.getAccessTokenAfterRegistration(user);
+    }
 
     @Test
     @DisplayName("Создание заказа с авторизацией")
@@ -87,7 +97,8 @@ public class OrderCreationTests {
         ErrorResponse errorResponse = OrderSteps.extractError(response);
 
         // Assert
-        TestAssertions.assertStatusCode(response, 400);
+        // Числовой код заменен на читаемый метод
+        TestAssertions.assertStatusCodeBadRequest(response);
         TestAssertions.assertErrorResponse(errorResponse, "Ingredient ids must be provided");
     }
 
@@ -105,6 +116,7 @@ public class OrderCreationTests {
         Response response = OrderSteps.createOrderWithAuthAndGetResponse(order, accessToken);
 
         // Assert
-        TestAssertions.assertStatusCode(response, 500);
+        // Числовой код заменен на читаемый метод
+        TestAssertions.assertStatusCodeInternalServerError(response);
     }
 }

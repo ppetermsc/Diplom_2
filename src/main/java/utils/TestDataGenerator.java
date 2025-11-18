@@ -18,14 +18,6 @@ public class TestDataGenerator {
         );
     }
 
-    public static UserRequest generateExistingUser() {
-        return new UserRequest(
-                "existing@example.com",
-                "password123",
-                "Existing User"
-        );
-    }
-
     public static UserRequest generateUserWithoutEmail() {
         return new UserRequest(
                 null,
@@ -39,14 +31,6 @@ public class TestDataGenerator {
                 "test@example.com",
                 null,
                 "User Without Password"
-        );
-    }
-
-    public static UserRequest generateUserWithInvalidCredentials() {
-        return new UserRequest(
-                "invalid@example.com",
-                "wrongpassword",
-                "Invalid User"
         );
     }
 

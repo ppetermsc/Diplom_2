@@ -6,6 +6,8 @@ import api.models.response.OrderResponse;
 import io.restassured.response.Response;
 import org.junit.Assert;
 
+import static org.apache.http.HttpStatus.*; //Добавлен импорт
+
 public class TestAssertions {
 
     public static void assertSuccessResponse(UserResponse response) {
@@ -23,6 +25,24 @@ public class TestAssertions {
 
     public static void assertStatusCode(Response response, int expectedStatusCode) {
         Assert.assertEquals("Status code should match", expectedStatusCode, response.getStatusCode());
+    }
+
+    // Добавлены методы с читаемыми названиями статусов
+    public static void assertStatusCodeBadRequest(Response response) {
+        assertStatusCode(response, SC_BAD_REQUEST);
+    }
+
+    public static void assertStatusCodeUnauthorized(Response response) {
+        assertStatusCode(response, SC_UNAUTHORIZED);
+    }
+
+    public static void assertStatusCodeForbidden(Response response) {
+        assertStatusCode(response, SC_FORBIDDEN);
+    }
+
+
+    public static void assertStatusCodeInternalServerError(Response response) {
+        assertStatusCode(response, SC_INTERNAL_SERVER_ERROR);
     }
 
     public static void assertUserData(UserResponse response, String expectedEmail, String expectedName) {
