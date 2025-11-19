@@ -8,6 +8,7 @@ public class UserResponse {
     private User user;
     private String accessToken;
     private String refreshToken;
+    private String message;
 
     @Data
     public static class User {

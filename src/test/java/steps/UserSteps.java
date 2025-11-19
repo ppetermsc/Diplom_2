@@ -41,4 +41,9 @@ public class UserSteps {
     public static ErrorResponse extractError(Response response) {
         return UserClient.extractErrorResponse(response);
     }
+
+    @Step("Удалить пользователя")
+    public static void deleteUser(String accessToken) {
+        Response response = UserClient.deleteUser(accessToken);
+    }
 }

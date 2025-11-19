@@ -26,6 +26,13 @@ public class UserClient {
                 .post(ApiEndpoints.BASE_URL + ApiEndpoints.LOGIN);
     }
 
+    public static Response deleteUser(String accessToken) {
+        return given()
+                .header("Authorization", accessToken)
+                .when()
+                .delete(ApiEndpoints.BASE_URL + ApiEndpoints.USER);
+    }
+
     public static UserResponse extractUserResponse(Response response) {
         return response.as(UserResponse.class);
     }

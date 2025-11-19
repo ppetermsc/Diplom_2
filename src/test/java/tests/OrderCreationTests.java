@@ -4,6 +4,7 @@ import api.models.request.OrderRequest;
 import api.models.request.UserRequest;
 import api.models.response.OrderResponse;
 import api.models.response.ErrorResponse;
+import org.junit.After;
 import org.junit.Assert;
 import steps.UserSteps;
 import steps.OrderSteps;
@@ -27,13 +28,18 @@ public class OrderCreationTests {
         accessToken = UserSteps.getAccessTokenAfterRegistration(user);
     }
 
+    @After
+    public void tearDown() {
+        if (accessToken != null) {
+            UserSteps.deleteUser(accessToken);
+        }
+    }
+
     @Test
     @DisplayName("Создание заказа с авторизацией")
     @Description("Проверка успешного создания заказа с валидным токеном авторизации")
     public void createOrderWithAuth() {
         // Arrange
-        UserRequest user = TestDataGenerator.generateUniqueUser();
-        String accessToken = UserSteps.getAccessTokenAfterRegistration(user);
         List<String> ingredients = TestDataGenerator.generateValidIngredients();
         OrderRequest order = new OrderRequest(ingredients);
 
@@ -69,8 +75,6 @@ public class OrderCreationTests {
     @Description("Проверка успешного создания заказа с валидными ингредиентами")
     public void createOrderWithIngredients() {
         // Arrange
-        UserRequest user = TestDataGenerator.generateUniqueUser();
-        String accessToken = UserSteps.getAccessTokenAfterRegistration(user);
         List<String> ingredients = TestDataGenerator.generateValidIngredients();
         OrderRequest order = new OrderRequest(ingredients);
 
@@ -87,8 +91,6 @@ public class OrderCreationTests {
     @Description("Проверка ошибки при создании заказа без указания ингредиентов")
     public void createOrderWithoutIngredients() {
         // Arrange
-        UserRequest user = TestDataGenerator.generateUniqueUser();
-        String accessToken = UserSteps.getAccessTokenAfterRegistration(user);
         List<String> emptyIngredients = TestDataGenerator.generateEmptyIngredients();
         OrderRequest order = new OrderRequest(emptyIngredients);
 
@@ -107,8 +109,6 @@ public class OrderCreationTests {
     @Description("Проверка ошибки при создании заказа с невалидными хешами ингредиентов")
     public void createOrderWithInvalidIngredientHash() {
         // Arrange
-        UserRequest user = TestDataGenerator.generateUniqueUser();
-        String accessToken = UserSteps.getAccessTokenAfterRegistration(user);
         List<String> invalidIngredients = TestDataGenerator.generateInvalidIngredientHash();
         OrderRequest order = new OrderRequest(invalidIngredients);
 

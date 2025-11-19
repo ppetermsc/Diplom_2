@@ -3,6 +3,7 @@ package tests;
 import api.models.request.UserRequest;
 import api.models.response.UserResponse;
 import api.models.response.ErrorResponse;
+import org.junit.After;
 import steps.UserSteps;
 import utils.TestDataGenerator;
 import io.qameta.allure.Description;
@@ -14,12 +15,20 @@ import org.junit.Test;
 public class UserLoginTests {
 
     private UserRequest existingUser;
+    private String accessToken;
 
     @Before
     public void setUp() {
         // Создаем пользователя до тестов
         existingUser = TestDataGenerator.generateUniqueUser();
         UserSteps.createUser(existingUser);
+    }
+
+    @After
+    public void tearDown() {
+        if (accessToken != null) {
+            UserSteps.deleteUser(accessToken);
+        }
     }
 
     @Test
