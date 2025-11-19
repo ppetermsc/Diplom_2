@@ -3,6 +3,8 @@ package tests;
 import api.models.request.UserRequest;
 import api.models.response.UserResponse;
 import api.models.response.ErrorResponse;
+import org.junit.After;
+import org.junit.Before;
 import steps.UserSteps;
 import utils.TestDataGenerator;
 import io.qameta.allure.Description;
@@ -12,15 +14,29 @@ import org.junit.Test;
 
 public class UserRegistrationTests {
 
+    private UserRequest user;
+    private String accessToken;
+
+    @Before
+    public void setUp() {
+        user = TestDataGenerator.generateUniqueUser();
+    }
+
+    @After
+    public void tearDown() {
+        // Удаляем пользователя после каждого теста, если он был создан
+        if (accessToken != null) {
+            UserSteps.deleteUser(accessToken);
+        }
+    }
+
     @Test
     @DisplayName("Создание уникального пользователя")
     @Description("Проверка успешной регистрации нового пользователя с валидными данными")
     public void createUniqueUser() {
-        // Arrange
-        UserRequest user = TestDataGenerator.generateUniqueUser();
-
         // Act
         UserResponse response = UserSteps.createUser(user);
+        accessToken = response.getAccessToken(); // Сохраняем токен для удаления
 
         // Assert
         TestAssertions.assertSuccessResponse(response);
@@ -32,18 +48,14 @@ public class UserRegistrationTests {
     @DisplayName("Создание уже зарегистрированного пользователя")
     @Description("Проверка ошибки при попытке регистрации существующего пользователя")
     public void createExistingUser() {
-        // Arrange
-        UserRequest existingUser = TestDataGenerator.generateUniqueUser();
-
-        // Сначала создаем пользователя
-        UserSteps.createUser(existingUser);
+        // Arrange - сначала создаем пользователя
+        UserSteps.createUser(user);
 
         // Act - пытаемся опять создать того же пользователя
-        Response response = UserSteps.createUserAndGetResponse(existingUser);
+        Response response = UserSteps.createUserAndGetResponse(user);
         ErrorResponse errorResponse = UserSteps.extractError(response);
 
         // Assert
-        // Числовой код заменен на читаемый метод
         TestAssertions.assertStatusCodeForbidden(response);
         TestAssertions.assertErrorResponse(errorResponse, "User already exists");
     }
